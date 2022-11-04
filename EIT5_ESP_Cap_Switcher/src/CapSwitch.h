@@ -20,6 +20,11 @@ class CapSwitch {
         uint8_t _cap_amount;
         uint8_t _pin_start;
 
+        /* Another base variable */
+        bool _single_pin_state = false;
+
+        int FindTableIndex(uint8_t val);
+
     public:
         /* Variables */
 
@@ -28,6 +33,7 @@ class CapSwitch {
         int StaticSwitch(CapSwitch capCluster, uint8_t capState);
         int PWMSwitch(CapSwitch capCluster, uint8_t pwmVal);
         int TestSwitches(CapSwitch capCluster);
+        int SingleStaticSwitch(CapSwitch capCluster, uint8_t capState);
 };
 
 #endif
