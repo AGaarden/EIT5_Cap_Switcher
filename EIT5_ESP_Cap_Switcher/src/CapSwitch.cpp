@@ -68,7 +68,7 @@ int CapSwitch::ClusterStaticSwitch(uint8_t capState) {
 
 /*
  * Name: SingleStaticSwitch
- * Input: capCluster, capState
+ * Input: capState
  * Output: Error code
  * Remarks:
 */
@@ -82,14 +82,22 @@ int CapSwitch::SingleStaticSwitch(uint8_t capState) {
 
 /*
  * Name: PWMSwitch
+ * Input: dutyVal
+ * Output: Error code
+ * Remarks:
 */
-int CapSwitch::SinglePWMSwitch(uint8_t pwmVal) {
+int CapSwitch::SinglePWMSwitch(uint8_t dutyVal) {
+    
+    int pwmVal = map(dutyVal, 0, 100, 0, 255);
 
+    ledcAttachPin(_pin_start, 1);
+    ledcWrite(_pin_start, pwmVal);
+    ledcDetachPin(_pin_start);
 }
 
 /*
  * Name: TestSwitches
- * Input: capCluster
+ * Input: 
  * Output: Error code
  * Remarks: uses CapTableTest LUT
 */
