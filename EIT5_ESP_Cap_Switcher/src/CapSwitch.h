@@ -30,10 +30,11 @@ class CapSwitch {
 
         /* Functions */
         CapSwitch(uint8_t cap_amount = BASE_CAP_AMOUNT, uint8_t pin_start = BASE_PIN_START);
-        int StaticSwitch(CapSwitch capCluster, uint8_t capState);
-        int PWMSwitch(CapSwitch capCluster, uint8_t pwmVal);
-        int TestSwitches(CapSwitch capCluster);
-        int SingleStaticSwitch(CapSwitch capCluster, uint8_t capState);
+        int ClusterStaticSwitch(uint8_t capState);
+        int SingleStaticSwitch(uint8_t capState);
+        int SinglePWMSwitch(uint8_t pwmVal);
+
+        int TestSwitches();
 };
 
 #endif

@@ -42,19 +42,19 @@ int CapSwitch::FindTableIndex(uint8_t val) {
 
 /*
  * Name: StaticSwitch
- * Input: capCluster, capState
+ * Input: capState
  * Output: Error code
  * Remarks:
  * 
 */
-int CapSwitch::StaticSwitch(CapSwitch capCluster, uint8_t capState) {
+int CapSwitch::ClusterStaticSwitch(uint8_t capState) {
     
     unsigned char b;
     int tableIndex = FindTableIndex(capState);
     
-    for(int j = 3; 0 <= j; j--) {
+    for(int j = _cap_amount - 1; 0 <= j; j--) {
         b = (CapTable[tableIndex][1] >> j) & 0b01;
-        uint8_t capPin = capCluster._pin_start + j;
+        uint8_t capPin = _pin_start + j;
 
         if(b) {
             digitalWrite(capPin, HIGH);
@@ -67,9 +67,23 @@ int CapSwitch::StaticSwitch(CapSwitch capCluster, uint8_t capState) {
 }
 
 /*
+ * Name: SingleStaticSwitch
+ * Input: capCluster, capState
+ * Output: Error code
+ * Remarks:
+*/
+int CapSwitch::SingleStaticSwitch(uint8_t capState) {
+
+    digitalWrite((_pin_start), !_single_pin_state);
+    _single_pin_state = !_single_pin_state;
+
+    return 0;
+}
+
+/*
  * Name: PWMSwitch
 */
-int CapSwitch::PWMSwitch(CapSwitch capCluster, uint8_t pwmVal) {
+int CapSwitch::SinglePWMSwitch(uint8_t pwmVal) {
 
 }
 
@@ -79,7 +93,7 @@ int CapSwitch::PWMSwitch(CapSwitch capCluster, uint8_t pwmVal) {
  * Output: Error code
  * Remarks: uses CapTableTest LUT
 */
-int CapSwitch::TestSwitches(CapSwitch capCluster) {
+int CapSwitch::TestSwitches() {
 
     /* 16 test cases in the LUT */
     for(int i = 0; i < 16; i++) {
@@ -87,7 +101,7 @@ int CapSwitch::TestSwitches(CapSwitch capCluster) {
         unsigned char b;
         for(int j = 3; 0 <= j; j--) {
             b = (CapTableTest[i][1] >> j) & 0b01;
-            uint8_t capPin = capCluster._pin_start + j;
+            uint8_t capPin = _pin_start + j;
 
             if(b) {
                 digitalWrite(capPin, HIGH);
@@ -98,20 +112,6 @@ int CapSwitch::TestSwitches(CapSwitch capCluster) {
         }
         delay(1000);
     }
-
-    return 0;
-}
-
-/*
- * Name: SingleStaticSwitch
- * Input: capCluster, capState
- * Output: Error code
- * Remarks:
-*/
-int CapSwitch::SingleStaticSwitch(CapSwitch capCluster, uint8_t capState) {
-
-    digitalWrite((capCluster._pin_start), !capCluster._single_pin_state);
-    capCluster._single_pin_state = !capCluster._single_pin_state;
 
     return 0;
 }
