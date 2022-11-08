@@ -24,6 +24,7 @@ class CapSwitch {
         bool _single_pin_state = false;
 
         int FindTableIndex(uint8_t val);
+        int FindTestTableIndex(uint8_t val);
 
     public:
         /* Variables */

@@ -1,36 +1,49 @@
 
 
 #include <Arduino.h>
+#include <Esp.h>
 #include <CapSwitch.h>
 
 /* Set up cap switches */
-CapSwitch switch1(4, 31);
-CapSwitch switch2(4, 36);
-CapSwitch switchTrim; /* THIS IS A SINGLE PIN AT PIN 30 */
+CapSwitch switch1(4, 32); // Pins 34-35 do not work on my board
+CapSwitch switch2(4, 16);
+CapSwitch switchTrim; // THIS IS A SINGLE PIN AT PIN 30
 const int switchArrSize = 3;
 CapSwitch switchArr[switchArrSize] = {switch1, switch2, switchTrim};
 
-/* Variables used in loop */
-String command;
-int cluster;
-int state;
 
 void setup() {
+    /*
+    for(int i = 0; i < 3; i++) {
+        switchArr[i].begin();
+    }
+    */
+    
+    Serial.begin(115200);
+    while(!Serial) {}
+    Serial.println("Setup happening");
+
     ledcSetup(1, 12000, 8);
 
     Serial.begin(115200);
     Serial.println("Ready to receive\n");
+    
 }
 
 void loop() {
+    // if(!Serial.available()) {
+    //     Serial.printf("Nothing received yet\n");
+    //     delay(1000);
+    // }
+
     if(Serial.available()) {
-        /* Form will be *,*,* */
+        // Form will be *,*,*
 
-        command = Serial.readStringUntil(',');
-        cluster = Serial.readStringUntil(',').toInt();
-        state   = Serial.readStringUntil('\n').toInt();
+        String command = Serial.readStringUntil(',');
+        int cluster    = Serial.readStringUntil(',').toInt();
+        int state      = Serial.readStringUntil('\n').toInt();
 
-        if(cluster == NULL || state == NULL) {return;}
+        // if(cluster == 0 || state == 0) {return;}
 
         if(cluster < 0 || cluster > switchArrSize) {
             Serial.printf("Error: Cluster number out of bounds\n");
@@ -41,10 +54,10 @@ void loop() {
                 Serial.printf("Switch cluster %i changed to static state %i\n", cluster, state);
             }
             else {
-                Serial.printf("Something went wrong");
+                Serial.printf("Something went wrong\n");
             }
         }
-        else if(command.equals("single")) {
+        else if(command.equals("sinagle")) {
             if(state < 0 || state > 1) {
                 Serial.printf("Error: State is not 0 or 1\n");
                 return;
@@ -53,7 +66,7 @@ void loop() {
                 Serial.printf("Switch %i changed to static state %i\n", cluster, state);
             }
             else {
-                Serial.printf("Something went wrong");
+                Serial.printf("Something went wrong\n");
             }
         }
         else if(command.equals("pwm")) {
@@ -62,10 +75,18 @@ void loop() {
                 return;
             }
             if(switchArr[cluster].SinglePWMSwitch(state) == 0) {
-                Serial.printf("Switch %i changed to duty cycle %i%\n", cluster, state);
+                Serial.printf("Switch %d changed to duty cycle %d%%\n", cluster, state);
             }
             else {
-                Serial.printf("Something went wrong");
+                Serial.printf("Something went wrong\n");
+            }
+        }
+        else if(command.equals("test")) {
+            if(switchArr[cluster].TestSwitches() == 0) {
+                Serial.printf("Switches tested\n");
+            }
+            else {
+                Serial.printf("Something went wrong\n");
             }
         }
 
@@ -73,4 +94,5 @@ void loop() {
             Serial.printf("Invalid command\n");
         }
     }
+
 }

@@ -21,8 +21,8 @@ CapSwitch::CapSwitch(uint8_t cap_amount, uint8_t pin_start) {
     _pin_start = pin_start;
 
     /* Set pins as outputs */
-    for(int i = 0; i < cap_amount; i++) {
-        pinMode((pin_start + i), OUTPUT);
+    for(int i = 0; i < _cap_amount; i++) {
+        pinMode((_pin_start + i), OUTPUT);
     }
 }
 
@@ -38,6 +38,18 @@ int CapSwitch::FindTableIndex(uint8_t val) {
             return i;
         }
     }
+
+    return -1;
+}
+int CapSwitch::FindTestTableIndex(uint8_t val) {
+    
+    for(int i = 0; i < 16; i++) {
+        if(CapTableTest[i][0] == val) {
+            return i;
+        }
+    }
+
+    return -1;
 }
 
 /*
@@ -51,7 +63,8 @@ int CapSwitch::ClusterStaticSwitch(uint8_t capState) {
     
     unsigned char b;
     int tableIndex = FindTableIndex(capState);
-    
+    if(tableIndex == -1) {return 1;}
+
     for(int j = _cap_amount - 1; 0 <= j; j--) {
         b = (CapTable[tableIndex][1] >> j) & 0b01;
         uint8_t capPin = _pin_start + j;
@@ -64,6 +77,7 @@ int CapSwitch::ClusterStaticSwitch(uint8_t capState) {
         }
     }
     
+    return 0;
 }
 
 /*
@@ -93,6 +107,8 @@ int CapSwitch::SinglePWMSwitch(uint8_t dutyVal) {
     ledcAttachPin(_pin_start, 1);
     ledcWrite(_pin_start, pwmVal);
     ledcDetachPin(_pin_start);
+
+    return 0;
 }
 
 /*
@@ -107,17 +123,24 @@ int CapSwitch::TestSwitches() {
     for(int i = 0; i < 16; i++) {
 
         unsigned char b;
+        int tableIndex = FindTestTableIndex(i);
+        if(tableIndex == -1) {return 1;}
+        
         for(int j = 3; 0 <= j; j--) {
-            b = (CapTableTest[i][1] >> j) & 0b01;
+            // b = (CapTableTest[i][1] >> j) & 0b01;
+            b = (CapTableTest[tableIndex][1] >> j) & 0b01;
             uint8_t capPin = _pin_start + j;
 
             if(b) {
                 digitalWrite(capPin, HIGH);
+                Serial.printf("Writing HIGH to pin %i\n", capPin);
             }
             else {
                 digitalWrite(capPin, LOW);
+                Serial.printf("Writing LOW to pin %i\n", capPin);
             }
         }
+        Serial.printf("\n");
         delay(1000);
     }
 
