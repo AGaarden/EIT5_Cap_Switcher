@@ -13,12 +13,6 @@ CapSwitch switchArr[switchArrSize] = {switch1, switch2, switchTrim};
 
 
 void setup() {
-    /*
-    for(int i = 0; i < 3; i++) {
-        switchArr[i].begin();
-    }
-    */
-    
     Serial.begin(115200);
     while(!Serial) {}
     Serial.println("Setup happening");
@@ -31,11 +25,6 @@ void setup() {
 }
 
 void loop() {
-    // if(!Serial.available()) {
-    //     Serial.printf("Nothing received yet\n");
-    //     delay(1000);
-    // }
-
     if(Serial.available()) {
         // Form will be *,*,*
 
